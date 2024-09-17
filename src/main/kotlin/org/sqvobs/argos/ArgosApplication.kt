@@ -11,7 +11,10 @@ class ArgosApplication
 
 fun main(args: Array<String>) {
 
-	val context: ApplicationContext = runApplication<ArgosApplication>(*args)
-	val collectIncidence = context.getBean(CollectIncidence::class.java)
-	collectIncidence.collect()
+    val context: ApplicationContext = runApplication<ArgosApplication>(*args)
+
+    if (args.any { it == "command=collect-incidences" }) {
+        val collectIncidence = context.getBean(CollectIncidence::class.java)
+        collectIncidence.collect()
+    }
 }
