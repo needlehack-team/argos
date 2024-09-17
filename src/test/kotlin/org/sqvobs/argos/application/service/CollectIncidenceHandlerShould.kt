@@ -3,13 +3,15 @@ package org.sqvobs.argos.application.service
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import org.sqvobs.argos.application.port.out.IncidenceExtractor
+import org.sqvobs.argos.application.port.out.Incidences
 import org.sqvobs.argos.domain.*
 
 class CollectIncidenceHandlerShould {
 
     private val incidenceExtractor: IncidenceExtractor = mock()
+    private val repository: Incidences = mock()
 
-    private val collectIncidenceHandler = CollectIncidenceHandler(incidenceExtractor)
+    private val collectIncidenceHandler = CollectIncidenceHandler(incidenceExtractor, repository)
 
     @Test
     fun `should call extract and collect incidences until there were no more`() {

@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: argos
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    jpa:
+      repositories:
+        enabled: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/argos
+    username: ivangrod
+    password: s3cr3t
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

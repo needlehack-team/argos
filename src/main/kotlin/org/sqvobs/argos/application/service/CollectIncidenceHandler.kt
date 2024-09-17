@@ -3,28 +3,34 @@ package org.sqvobs.argos.application.service
 import org.slf4j.LoggerFactory
 import org.sqvobs.argos.application.port.`in`.CollectIncidence
 import org.sqvobs.argos.application.port.out.IncidenceExtractor
+import org.sqvobs.argos.application.port.out.Incidences
 import java.util.*
 
-class CollectIncidenceHandler(private val incidenceExtractor: IncidenceExtractor) : CollectIncidence {
+class CollectIncidenceHandler(
+    private val incidenceExtractor: IncidenceExtractor,
+    private val repository: Incidences
+) : CollectIncidence {
 
     companion object {
         private val log = LoggerFactory.getLogger(CollectIncidenceHandler::class.java)
+        private const val TWO_SECONDS_AT_MILLIS: Long = 2000
     }
 
     override fun collect() {
-
-        generateSequence(Paging(107, 90)) { previousPaging -> previousPaging.next() }
+        generateSequence(Paging(1, 90)) { previousPaging -> previousPaging.next() }
             .map { paging ->
                 Timer().schedule(object : TimerTask() {
                     override fun run() {
                         // TODO Extract this functionality to implementation details
                     }
-                }, 2000)
+                }, TWO_SECONDS_AT_MILLIS)
                 incidenceExtractor.extract(paging)
             }
+            .onEach { incidences -> repository.saveAll(incidences) }
             .onEach { incidences -> log.info("Incidences collected $incidences") }
             .takeWhile { incidences -> incidences.isNotEmpty() }
             .toList()
+
     }
 
     data class Paging(val offset: Int = 1, val limit: Int = 90) {
