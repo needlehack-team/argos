@@ -25,7 +25,7 @@ class HttpTinyBirdEventCreator() {
 
     fun generateEvents(incidences: List<Incidence>) {
 
-        val url = "https://api.eu-central-1.aws.tinybird.co/v0/events?name=incidences"
+        val url = "https://api.eu-central-1.aws.tinybird.co/v0/events?name=incidences2"
         val auth = "TBD"
 
         if (auth == "TBD"){
