@@ -4,11 +4,13 @@ import org.slf4j.LoggerFactory
 import org.sqvobs.argos.application.port.`in`.CollectIncidence
 import org.sqvobs.argos.application.port.out.IncidenceExtractor
 import org.sqvobs.argos.application.port.out.Incidences
+import org.sqvobs.argos.infrastructure.adapter.out.http.HttpTinyBirdEventCreator
 import java.util.*
 
 class CollectIncidenceHandler(
     private val incidenceExtractor: IncidenceExtractor,
-    private val repository: Incidences
+    private val repository: Incidences,
+    private val tinyBirdEventCreator: HttpTinyBirdEventCreator
 ) : CollectIncidence {
 
     companion object {
@@ -27,6 +29,7 @@ class CollectIncidenceHandler(
                 incidenceExtractor.extract(paging)
             }
             .onEach { incidences -> repository.saveAll(incidences) }
+            .onEach { incidences -> tinyBirdEventCreator.generateEvents(incidences) }
             .onEach { incidences -> log.info("Incidences collected $incidences") }
             .takeWhile { incidences -> incidences.isNotEmpty() }
             .toList()

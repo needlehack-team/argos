@@ -7,6 +7,7 @@ import org.sqvobs.argos.application.port.out.IncidenceExtractor
 import org.sqvobs.argos.application.port.out.Incidences
 import org.sqvobs.argos.application.service.CollectIncidenceHandler
 import org.sqvobs.argos.infrastructure.adapter.out.http.HttpIncidenceExtractor
+import org.sqvobs.argos.infrastructure.adapter.out.http.HttpTinyBirdEventCreator
 import org.sqvobs.argos.infrastructure.adapter.out.persistence.JpaIncidenceRepository
 import org.sqvobs.argos.infrastructure.adapter.out.persistence.JpaIncidences
 
@@ -23,6 +24,6 @@ class BeanInitializr {
     fun incidenceExtractor(restTemplate: RestTemplate): IncidenceExtractor = HttpIncidenceExtractor(restTemplate)
 
     @Bean
-    fun collectIncidence(incidenceExtractor: IncidenceExtractor, repository: Incidences): CollectIncidenceHandler =
-        CollectIncidenceHandler(incidenceExtractor, repository)
+    fun collectIncidence(incidenceExtractor: IncidenceExtractor, repository: Incidences, tinyBirdEventCreator: HttpTinyBirdEventCreator): CollectIncidenceHandler =
+        CollectIncidenceHandler(incidenceExtractor, repository, tinyBirdEventCreator)
 }

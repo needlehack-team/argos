@@ -30,7 +30,6 @@ class HttpIncidenceExtractor(private val restTemplate: RestTemplate) : Incidence
             null,
             object : ParameterizedTypeReference<List<ExternalIncidence>>() {}
         ).body
-
         return response?.map(::fromExternalIncidence) ?: emptyList()
     }
 
