@@ -5,6 +5,7 @@ import org.sqvobs.argos.application.port.`in`.CollectIncidence
 import org.sqvobs.argos.application.port.out.IncidenceExtractor
 import org.sqvobs.argos.application.port.out.Incidences
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 class CollectIncidenceHandler(
     private val incidenceExtractor: IncidenceExtractor,
@@ -13,24 +14,29 @@ class CollectIncidenceHandler(
 
     companion object {
         private val log = LoggerFactory.getLogger(CollectIncidenceHandler::class.java)
-        private const val TWO_SECONDS_AT_MILLIS: Long = 2000
+        private const val TWO_SECONDS: Int = 2
+        private const val LIMIT_PAGE_TO_COLLECT: Int = 111
     }
 
     override fun collect() {
         generateSequence(Paging(1, 90)) { previousPaging -> previousPaging.next() }
+            .takeWhile { paging -> paging.offset <= LIMIT_PAGE_TO_COLLECT }
             .map { paging ->
-                Timer().schedule(object : TimerTask() {
-                    override fun run() {
-                        // TODO Extract this functionality to implementation details
-                    }
-                }, TWO_SECONDS_AT_MILLIS)
+                stopSeconds(TWO_SECONDS)
                 incidenceExtractor.extract(paging)
             }
             .onEach { incidences -> repository.saveAll(incidences) }
             .onEach { incidences -> log.info("Incidences collected $incidences") }
-            .takeWhile { incidences -> incidences.isNotEmpty() }
             .toList()
 
+    }
+
+    private fun stopSeconds(seconds: Int) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                log.debug("Throttling with $seconds seconds interval")
+            }
+        }, seconds.seconds.inWholeMilliseconds)
     }
 
     data class Paging(val offset: Int = 1, val limit: Int = 90) {
