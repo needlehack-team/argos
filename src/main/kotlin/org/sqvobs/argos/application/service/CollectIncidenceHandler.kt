@@ -28,7 +28,6 @@ class CollectIncidenceHandler(
             .onEach { incidences -> repository.saveAll(incidences) }
             .onEach { incidences -> log.info("Incidences collected $incidences") }
             .toList()
-
     }
 
     private fun stopSeconds(seconds: Int) {
