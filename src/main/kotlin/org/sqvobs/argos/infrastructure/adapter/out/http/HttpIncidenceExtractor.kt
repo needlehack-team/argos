@@ -17,8 +17,8 @@ class HttpIncidenceExtractor(private val restTemplate: RestTemplate) : Incidence
         private const val INDICENCE_URL = "https://api-pgics.sevilla.org/requests"
     }
 
-    override fun extract(page: CollectIncidenceHandler.Paging): List<Incidence> {
-        val response = restTemplate.exchange(
+    override fun extract(page: CollectIncidenceHandler.Paging): List<Incidence> = try {
+        restTemplate.exchange(
             UriComponentsBuilder
                 .fromHttpUrl(INDICENCE_URL)
                 .queryParam("jurisdiction_ids", "org.sevilla")
@@ -29,11 +29,11 @@ class HttpIncidenceExtractor(private val restTemplate: RestTemplate) : Incidence
             HttpMethod.GET,
             null,
             object : ParameterizedTypeReference<List<ExternalIncidence>>() {}
-        ).body
-
-        return response?.map(::fromExternalIncidence) ?: emptyList()
+        ).body?.map(::fromExternalIncidence) ?: emptyList()
+    } catch (e: Exception) {
+        log.error("Error fetching incidences: ${e.message}", e)
+        emptyList()
     }
-
 
     data class ExternalIncidence(
         @JsonProperty("service_id")
